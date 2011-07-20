@@ -27,12 +27,11 @@ public class Crosswords {
 		
 		// check the input
 		if (isValid(words)) {
+			// process the input to create the crosswords
 			showCrosswords(words);
 		} else {
 			System.out.println("The words you enter is not valid.");
 		}
-		
-		// process the input to create the crosswords
 	}
 	
 	private static boolean isValid(String words) {
