@@ -20,7 +20,11 @@ import javax.swing.JOptionPane;
  * @author thiego
  */
 public class JFclient extends javax.swing.JFrame {
-
+    Socket socket;
+    ObjectOutputStream outpout;
+    ObjectInputStream input;
+    String console;
+    String words;
     /**
      * Creates new form JFclient
      */
@@ -46,37 +50,57 @@ public class JFclient extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jTextField2 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Crossword with Sockets");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jLabel2.setText("SD CROSSWORDS");
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel2.setText("CROSSWORD");
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(9);
-        jTextArea1.setFont(new java.awt.Font("Monospaced", 0, 22)); // NOI18N
+        jTextArea1.setFont(new java.awt.Font("Monospaced", 0, 19)); // NOI18N
         jTextArea1.setRows(9);
         jScrollPane1.setViewportView(jTextArea1);
 
+        jTextArea2.setEditable(false);
         jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
+        jTextArea2.setRows(8);
+        jTextArea2.setTabSize(50);
         jScrollPane2.setViewportView(jTextArea2);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel1.setText("CONSOLE:");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel3.setText("IP SERVIDOR:");
 
-        jButton1.setText("CONECTAR");
+        jTextField1.setText("localhost");
+
+        jButton1.setText("CONNECT");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("REPLY");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
             }
         });
 
@@ -91,19 +115,23 @@ public class JFclient extends javax.swing.JFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jTextField2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jTextField1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTextField1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(299, 299, 299)
                 .addComponent(jLabel3)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -112,17 +140,21 @@ public class JFclient extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)
-                        .addGap(3, 3, 3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton1))
+                        .addGap(7, 7, 7)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton2)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -130,63 +162,85 @@ public class JFclient extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    
-        //System.out.println(args.clone());
-        String words = null;
-        BufferedReader reader;
-	reader = new BufferedReader(new InputStreamReader(System.in));
-        
         try {
             if (jTextField1.getText().equals("")) {
                 JOptionPane.showMessageDialog(rootPane, "Informe o endereço do servidor!");
             } else {
             words = JOptionPane.showInputDialog("Qual o seu nome jogador? ");
-            Socket socket = new Socket(jTextField1.getText(), 5555);
-            String console = null;
-            console += "\nServidor conectado";
-            jTextArea2.setText(words.toString());
-            console += "\nOlá, "+words+". Idenficação enviada, aguardando desafio...";
-            jTextArea2.setText(console);
-            ObjectOutputStream outpout = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+            socket = new Socket(jTextField1.getText(), 5555);
+            if (null == jTextArea2.getText())    
+                console = "\nServidor conectado";
+            else
+                console = "Servidor conectado";
+            jTextArea2.append(console);
+            console = "\nOlá, "+words+". Idenficação enviada\nAguardando desafio...";
+            jTextArea2.append(console);
+            outpout = new ObjectOutputStream(socket.getOutputStream());
+            input = new ObjectInputStream(socket.getInputStream());
             outpout.writeUTF(words);
             outpout.flush();
             words = input.readUTF();
             jTextArea1.setText(words);
-            console += "\nQual a palavra relacionada com SD disposta na matriz: ";
-            jTextArea2.setText(console);
-            //words = reader.readLine();
-            outpout.writeUTF(words);
-            outpout.flush();
-            while(!input.readBoolean()){
+            console = "\nQual a palavra relacionada\na SD disposta na matriz: ";
+            jTextArea2.append(console);
+            jTextField2.requestFocus();            
+            /*while(!input.readBoolean()){
                 console += "\nResposta incorreta, tente novamente: ";
+                System.out.println(console);
                 jTextArea2.setText(console);
                 //words = reader.readLine();
                 outpout.writeUTF(words);
                 outpout.flush();
             }
-            console += "\nResposta correta!";
-            jTextArea2.setText(console);
+            console = "\nResposta correta!";
+            System.out.println(console);
+            jTextArea2.append(console);
             input.close();
             outpout.close();
-            socket.close();
+            socket.close();*/
             }
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //}else{
-        //    System.out.println("Necessário informar o IP do servidor como parametro");
-        //   System.exit(0);
-        //}
-        
+            System.out.println("Erro: "+ex.getMessage());
+        }        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-      
-        
+        jTextField1.requestFocus();        
     }//GEN-LAST:event_formWindowOpened
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        enviarReply();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+
+    }//GEN-LAST:event_jTextField2ActionPerformed
     
-    
+    void enviarReply(){
+        if (!jTextField2.getText().equals("")) {
+            String reply = jTextField2.getText();
+            try {
+                outpout.writeUTF(reply);
+                outpout.flush();
+                if(!input.readBoolean()){
+                    console = "\nResposta incorreta, tente novamente: ";
+                    jTextArea2.append(console);
+                    jTextField2.setText("");
+                }else{
+                    console = "\nResposta correta!";
+                    jTextArea2.append(console);
+                    input.close();
+                    outpout.close();
+                    socket.close();
+                }                
+            } catch (IOException ex) {
+                Logger.getLogger(JFclient.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "informe uma resposta válida!");
+        }
+    }
     
     /**
      * @param args the command line arguments
@@ -226,35 +280,15 @@ public class JFclient extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
-    private javax.swing.JLabel jLabel35;
-    private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel37;
-    private javax.swing.JLabel jLabel38;
-    private javax.swing.JLabel jLabel39;
-    private javax.swing.JLabel jLabel40;
-    private javax.swing.JLabel jLabel41;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }
