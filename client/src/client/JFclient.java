@@ -5,6 +5,7 @@
  */
 package client;
 
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -163,54 +164,51 @@ public class JFclient extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            if (jTextField1.getText().equals("")) {
+            if (jTextField1.getText().equals("")) {//compara se usuario digitou end servidor
                 JOptionPane.showMessageDialog(rootPane, "Informe o endereço do servidor!");
             } else {
             words = JOptionPane.showInputDialog("Qual o seu nome jogador? ");
-            socket = new Socket(jTextField1.getText(), 5555);
-            if (null == jTextArea2.getText())    
-                console = "\nServidor conectado";
+            jButton1.setEnabled(false);//desabilita botao de conexao, dps de conectado
+            socket = new Socket(jTextField1.getText(), 5555);//cria o socket no ip e porta ex: localhost:5555
+            if (null == jTextArea2.getText())
+                console = "\nServidor conectado: "+socket.getInetAddress();
             else
-                console = "Servidor conectado";
-            jTextArea2.append(console);
+                console = "Servidor conectado "+socket.getInetAddress();
+            JOptionPane.showMessageDialog(rootPane, console);//exibe mensagem ao usuario
+            jTextArea2.append(console);//adiciona texto ao console
             console = "\nOlá, "+words+". Idenficação enviada\nAguardando desafio...";
             jTextArea2.append(console);
-            outpout = new ObjectOutputStream(socket.getOutputStream());
-            input = new ObjectInputStream(socket.getInputStream());
-            outpout.writeUTF(words);
-            outpout.flush();
-            words = input.readUTF();
-            jTextArea1.setText(words);
-            console = "\nQual a palavra relacionada\na SD disposta na matriz: ";
+            JOptionPane.showMessageDialog(rootPane, console);
+            outpout = new ObjectOutputStream(socket.getOutputStream());//cria objeto para envio de mensagens via socket
+            input = new ObjectInputStream(socket.getInputStream());//cria objeto para receber mensagens via socket
+            outpout.writeUTF(words);//envia a indentificacao do usuário via socket, especificado na linha 170
+            outpout.flush();//libira o objeto para resposta por parte do servior
+            words = input.readUTF();//realizar a leitura da respota do servidor
+            jTextArea1.setText(words);//exibe palavra cruzada
+            console = "\nEncontre a palavra relacionada\na SD na matriz";
+            JOptionPane.showMessageDialog(rootPane, console);
             jTextArea2.append(console);
-            jTextField2.requestFocus();            
-            /*while(!input.readBoolean()){
-                console += "\nResposta incorreta, tente novamente: ";
-                System.out.println(console);
-                jTextArea2.setText(console);
-                //words = reader.readLine();
-                outpout.writeUTF(words);
-                outpout.flush();
+            jTextField2.requestFocus();//defini foco no campo de resposta
+            jTextField2.setEnabled(true);//habilita campo de respota
+            jButton2.setEnabled(true);//habilita botao de respota
             }
-            console = "\nResposta correta!";
-            System.out.println(console);
-            jTextArea2.append(console);
-            input.close();
-            outpout.close();
-            socket.close();*/
-            }
-        } catch (IOException ex) {
+        } catch (IOException ex) {//tratamento de erro do try, para caso a criacao do socket falhe ou de algo errado
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Erro: "+ex.getMessage());
+            JOptionPane.showMessageDialog(rootPane, ex.getMessage());
         }        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        jTextField1.requestFocus();        
+        //evento quando o windows abre
+        jTextField1.requestFocus();//seta o foco no botao do ip do servidor
+        jTextField2.setEnabled(false);//desabilita campo de respota inicialmente
+        jButton2.setEnabled(false);//desabilita botao de resposta inicialmente
     }//GEN-LAST:event_formWindowOpened
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        enviarReply();
+        //evento de clique no botao de chama
+        enviarReply();//metodo para enviar resposta
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -223,13 +221,19 @@ public class JFclient extends javax.swing.JFrame {
             try {
                 outpout.writeUTF(reply);
                 outpout.flush();
-                if(!input.readBoolean()){
+                if(!input.readBoolean()){//compara a respota recebido do servidor sobre a resposta
                     console = "\nResposta incorreta, tente novamente: ";
                     jTextArea2.append(console);
+                    JOptionPane.showMessageDialog(rootPane, console);
                     jTextField2.setText("");
                 }else{
-                    console = "\nResposta correta!";
+                    console = "\nResposta correta!\nReconecte ao servidor";
+                    jButton1.setEnabled(true);
                     jTextArea2.append(console);
+                    jTextField2.setText("");
+                    jTextField2.setEnabled(false);
+                    jButton2.setEnabled(false);
+                    JOptionPane.showMessageDialog(rootPane, console);
                     input.close();
                     outpout.close();
                     socket.close();

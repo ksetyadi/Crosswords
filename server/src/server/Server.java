@@ -50,7 +50,7 @@ public class Server {
 		reader = new BufferedReader(new InputStreamReader(System.in));
 		while(!isValid(words)){
                 System.out.println("Entre com uma palavra relacionada com SD de até 9 caracteres: ");
-                //System.out.print("Entre com 3 palavras com 9 caracteres e separadas por espaço: ");
+                
 		
 		try {
 			words = reader.readLine();
