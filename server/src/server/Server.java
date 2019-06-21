@@ -149,7 +149,7 @@ public class Server {
 		
 		System.out.println();
 		reply = "\n";
-		//reply = ("X" + " 1 2 3 4 5 6 7 8 9 0\n");
+		reply = ("X" + " 1 2 3 4 5 6 7 8 9 0\n");
 		
 		for (int row = 0; row <= 9; row++) {
 			for (int col = 0; col <= 9; col++) {
@@ -157,14 +157,15 @@ public class Server {
 					matrix[row][col] = anyRandomChar();
 				}
 				
-				//if (col == 0) {
-				//	reply = reply + (((row + 1) % 10) + " " + matrix[row][col] + " ");
-				//} else {
+				if (col == 0) {
+					reply = reply + (((row + 1) % 10) + " " + matrix[row][col] + " ");
+				} else {
 					reply = reply + (matrix[row][col] + " ");
-				//}
+				}
 			}
 			reply = reply + ("");
-                        reply = reply + ("\n");
+                        if(row!=9)
+                            reply = reply + ("\n");
 		}
                 outputreply.writeUTF(reply);
 	}
