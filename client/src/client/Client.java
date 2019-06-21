@@ -44,6 +44,7 @@ public class Client {
             outpout.writeUTF(words);
             outpout.flush();
             words = input.readUTF();
+            System.out.println("Desafio recebido");
             System.out.println(words);
             System.out.println("Qual a palavra relacionada com SD disposta na matriz: ");
             words = reader.readLine();
