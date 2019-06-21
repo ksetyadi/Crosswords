@@ -5,10 +5,7 @@
  */
 package client;
 
-import com.sun.org.apache.xml.internal.serializer.utils.Utils;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -193,7 +190,7 @@ public class JFclient extends javax.swing.JFrame {
             jButton2.setEnabled(true);//habilita botao de respota
             }
         } catch (IOException ex) {//tratamento de erro do try, para caso a criacao do socket falhe ou de algo errado
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JFclient.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Erro: "+ex.getMessage());
             JOptionPane.showMessageDialog(rootPane, ex.getMessage());
         }        
