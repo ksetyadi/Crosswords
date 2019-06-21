@@ -1,4 +1,4 @@
-Crosswords Sockets
+Crosswords in Java with Sockets Communication
 ---
 
 This is a sample crosswords communication in Java using Sockets
