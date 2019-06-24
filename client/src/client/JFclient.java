@@ -52,7 +52,7 @@ public class JFclient extends javax.swing.JFrame {
         jTextField2 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Crossword with Sockets");
+        setTitle("Client - Crossword with Sockets");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -192,8 +192,10 @@ public class JFclient extends javax.swing.JFrame {
         } catch (IOException ex) {//tratamento de erro do try, para caso a criacao do socket falhe ou de algo errado
             Logger.getLogger(JFclient.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Erro: "+ex.getMessage());
-            JOptionPane.showMessageDialog(rootPane, ex.getMessage());
-        }        
+            JOptionPane.showMessageDialog(rootPane, "Servidor inválido ou indisponível, verique o endereço!");
+            jButton1.setEnabled(true);
+            
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -218,12 +220,19 @@ public class JFclient extends javax.swing.JFrame {
             try {
                 outpout.writeUTF(reply);
                 outpout.flush();
-                if(!input.readBoolean()){//compara a respota recebido do servidor sobre a resposta
+                boolean resp;
+                do {
+                    
+                    
+                resp = input.readBoolean();
+                if(!resp){
                     console = "\nResposta incorreta, tente novamente: ";
                     jTextArea2.append(console);
                     JOptionPane.showMessageDialog(rootPane, console);
                     jTextField2.setText("");
-                }else{
+                }
+                } while (!resp);
+                
                     console = "\nResposta correta!\nReconecte ao servidor";
                     jButton1.setEnabled(true);
                     jTextArea2.append(console);
@@ -233,8 +242,7 @@ public class JFclient extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(rootPane, console);
                     input.close();
                     outpout.close();
-                    socket.close();
-                }                
+                    socket.close();              
             } catch (IOException ex) {
                 Logger.getLogger(JFclient.class.getName()).log(Level.SEVERE, null, ex);
             }
