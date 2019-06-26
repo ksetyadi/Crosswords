@@ -221,17 +221,14 @@ public class JFclient extends javax.swing.JFrame {
                 outpout.writeUTF(reply);
                 outpout.flush();
                 boolean resp;
-                do {
-                    
-                    
                 resp = input.readBoolean();
                 if(!resp){
                     console = "\nResposta incorreta, tente novamente: ";
                     jTextArea2.append(console);
                     JOptionPane.showMessageDialog(rootPane, console);
                     jTextField2.setText("");
-                }
-                } while (!resp);
+                    jTextField2.requestFocus();
+                }else{
                 
                     console = "\nResposta correta!\nReconecte ao servidor";
                     jButton1.setEnabled(true);
@@ -242,7 +239,8 @@ public class JFclient extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(rootPane, console);
                     input.close();
                     outpout.close();
-                    socket.close();              
+                    socket.close();  
+                }
             } catch (IOException ex) {
                 Logger.getLogger(JFclient.class.getName()).log(Level.SEVERE, null, ex);
             }

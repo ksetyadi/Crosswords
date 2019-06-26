@@ -32,6 +32,7 @@ public class JFserver extends javax.swing.JFrame {
     public static final int DOWN = 2;
     public ObjectOutputStream outpout;
     public ObjectInputStream input;
+    public String position=null;
     String msg, words;
     Socket socket;
     boolean result=false;
@@ -164,7 +165,7 @@ public class JFserver extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-               
+   
         words = jTextField3.getText();
         System.out.println(words);
         try {
@@ -182,7 +183,6 @@ public class JFserver extends javax.swing.JFrame {
         }
             msg = showCrosswords(words);
             outpout.writeUTF(msg);
-            System.out.println("words ok");
             outpout.flush();
             System.out.println("Aguardando resposta do desafio...");
             jTextArea3.append("Aguardando resposta do desafio...\n");
@@ -191,68 +191,82 @@ public class JFserver extends javax.swing.JFrame {
             while(!check){
                 msg = input.readUTF();
                 System.out.println("Resposta recebida: "+msg);
+                jTextArea3.append("Resposta recebida: "+msg+"\n");
             if (msg.trim().toUpperCase().equals(words.trim().toUpperCase())) {
                 System.out.println("Resposta correta!");
+                jTextArea3.append("Resposta correta!\n");
                 JOptionPane.showMessageDialog(rootPane, "Resposta correta!");
                 check=true;
                         try {
-                            outpout.writeBoolean(check);
+                            //outpout.writeBoolean(check);
                             jTextField3.setText("");
                             jTextField3.setEnabled(false);
                             jButton2.setEnabled(false);
+                            jLabel4.setText("AGUARDANDO");
+                            jLabel4.setForeground(Color.BLACK);
                             outpout.writeBoolean(check);
                             outpout.flush();
                             //fechaSocket(socket);
-                            jTextArea3.append("Cliente finalizado, aguardando nova conexao\n");
-                            System.out.println("Cliente finalizado, aguardando nova conexao\n");
+                            jTextArea3.append("Cliente finalizado\n");
+                            System.out.println("Cliente finalizado\n");
+                            
                         } catch (IOException ex) {
                             Logger.getLogger(JFserver.class.getName()).log(Level.SEVERE, null, ex);
                         }
             }else{
                 System.out.println("Resposta incorreta, aguardando nova tentativa...");
                 jTextArea3.append("Resposta incorreta, aguardando nova tentativa...\n");
+                outpout.writeBoolean(check);
+                outpout.flush();
             }
             }
             input.close(); //fecha stream de entrada
             outpout.close(); // fecha stream de saída
+            novaConexao();
         } catch (IOException ex) {
             Logger.getLogger(JFserver.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Erro: "+ex.getMessage());
+        } finally{
+            try {
+                fechaSocket(socket);
+            } catch (IOException ex) {
+                Logger.getLogger(JFserver.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+    void novaConexao(){
         try{
             jButton2.setEnabled(false);
             jTextField3.setEnabled(false);
-            System.out.println("Aguardando conexão do jogador..");
+            System.out.println("Aguardando conexão...");
             jTextArea3.append("Aguardando conexão...\n");
             JOptionPane.showMessageDialog(rootPane, "Aguardando conexão...");
-            criarServerSocket(5555);              
             socket = esperaConexao();
             System.out.println("Cliente conectado");
             jTextArea3.append("Cliente conectado\n");
             JOptionPane.showMessageDialog(rootPane, "Cliente conectado");
             jLabel4.setText("CONECTADO");
             jLabel4.setForeground(Color.BLUE);
-            outpout = new ObjectOutputStream(socket.getOutputStream());
-            input = new ObjectInputStream(socket.getInputStream());
-            msg = input.readUTF();
-            System.out.println("Mensagem recebida de " +msg);
-            jTextArea3.append("Mensagem recebida de " +msg+"\n");
-            JOptionPane.showMessageDialog(rootPane, "Mensagem recebida de " +msg);
-            jTextField3.setEnabled(true);
-            jButton2.setEnabled(true);
-            System.out.println("Entre com uma palavra relacionada com SD de até 9 caracteres: ");
-            JOptionPane.showMessageDialog(rootPane, "Entre com uma palavra relacionada com SD de até 9 caracteres: ");
-            jTextArea3.append("Entre com uma palavra relacionada \ncom SD de até 9 caracteres: \n");
-            jTextField3.requestFocus();
+            trataConexao(socket);            
         }catch(IOException e){
             JOptionPane.showMessageDialog(rootPane, "Erro: "+e.getMessage());
         }
         jButton2.setEnabled(true);
         jTextField3.setEnabled(true);
         jTextField3.requestFocus();
+    }
+    
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        try {
+            criarServerSocket(5555);
+            //while (true) {                
+                novaConexao();
+            //}
+        } catch (IOException ex) {
+            Logger.getLogger(JFserver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
     }//GEN-LAST:event_formWindowOpened
     
     public void criarServerSocket(int porta) throws IOException{
@@ -262,6 +276,21 @@ public class JFserver extends javax.swing.JFrame {
     public Socket esperaConexao() throws IOException{
         socket = serverSocket.accept();
         return socket;
+    }
+    
+    public void trataConexao(Socket socket) throws IOException{
+        outpout = new ObjectOutputStream(socket.getOutputStream());
+        input = new ObjectInputStream(socket.getInputStream());
+        msg = input.readUTF();
+        System.out.println("Mensagem recebida de " +msg);
+        jTextArea3.append("Mensagem recebida de " +msg+"\n");
+        JOptionPane.showMessageDialog(rootPane, "Mensagem recebida de " +msg);
+        jTextField3.setEnabled(true);
+        jButton2.setEnabled(true);
+        System.out.println("Entre com uma palavra relacionada com SD de até 9 caracteres");
+        JOptionPane.showMessageDialog(rootPane, "Entre com uma palavra relacionada com SD de até 9 caracteres");
+        jTextArea3.append("Entre com uma palavra relacionada com\nSD de até 9 caracteres");
+        jTextField3.requestFocus();
     }
     
     public void fechaSocket(Socket s) throws IOException{
@@ -343,10 +372,8 @@ public class JFserver extends javax.swing.JFrame {
 	
 	public static void putWord(String word) {
 		System.out.println("Tentando adiconar a palavra: " + word);
-		
 		Random random = new Random();
 		boolean isPutted = false;
-		
 		while (!isPutted) {
 			int row = random.nextInt(10 - word.length() + 1);
 			int col = random.nextInt(10 - word.length() + 1);
@@ -367,10 +394,10 @@ public class JFserver extends javax.swing.JFrame {
 					}
 					
 					System.out.println("A palavra " + word + " está adicionada a DIREITA em " + (row + 1) + ", " + (col + 1));
-					isPutted = true;
+                                        
+                                        isPutted = true;
 				}
 				break;
-				
 			case DIAGONAL:
 				int cols = col;
 				for (int pos = row; pos <= row + word.length() - 1; pos++) {
@@ -404,7 +431,7 @@ public class JFserver extends javax.swing.JFrame {
 						matrix[counter][col] = word.substring(counter - row, counter - row + 1).toUpperCase();
 					}
 					System.out.println("A palavra " + word + " está adicionada PARA BAIXO em " + (row + 1) + ", " + (col + 1));
-					isPutted = true;
+                                        isPutted = true;
 				}
 				
 				break;
@@ -418,6 +445,7 @@ public class JFserver extends javax.swing.JFrame {
             //System.out.println("Random char: " + result);
             return result;
     }
+    
     
     public void enviarWord(){
         
